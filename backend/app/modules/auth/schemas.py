@@ -4,18 +4,19 @@
 """
 from dataclasses import dataclass
 
-from app.models.user import USERNAME_PATTERN, PHONE_PATTERN, EMAIL_PATTERN
+from app.common.base_schema import BaseSchema
+from app.models import USERNAME_PATTERN, PHONE_PATTERN, EMAIL_PATTERN
 
 
 @dataclass
-class SignInSchema:
+class SignInSchema(BaseSchema):
     """登录请求参数校验：identifier 可以是用户名/手机号/邮箱"""
 
     identifier: str
     password: str
 
     @classmethod
-    def from_json(cls, payload: dict) -> 'SignInSchema':
+    def from_json(cls, payload):
         """json数据校验"""
 
         # 类型校验
@@ -41,16 +42,16 @@ class SignInSchema:
 
 
 @dataclass
-class SignUpSchema:
+class SignUpSchema(BaseSchema):
     """注册请求参数校验：用户名 手机号 邮箱 三选一必填"""
 
-    username: str = ''
-    phone: str = ''
-    email: str = ''
-    password: str = ''
+    username: str
+    phone: str
+    email: str
+    password: str
 
     @classmethod
-    def from_json(cls, payload: dict) -> 'SignUpSchema':
+    def from_json(cls, payload):
         """json数据校验"""
 
         # 类型校验

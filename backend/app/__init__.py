@@ -23,6 +23,19 @@ def create_app(config_name):
     # 导入模型，注册到 SQLAlchemy metadata
     import_models()
 
+    # 注册 JWT 错误回调
+    from app.common.response import register_jwt_callbacks
+    register_jwt_callbacks(jwt)
+
+    # 注册全局错误处理
+    from app.common.response import register_error_handlers
+    register_error_handlers(app)
+
+    # 导入api并由配置控制
+    from app.api import get_registry
+    for version in app.config["API_VERSIONS"]:
+        app.register_blueprint(get_registry()[version]())
+
     return app
 
 
