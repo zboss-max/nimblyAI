@@ -21,14 +21,14 @@ class BaseSchema(ABC):
         """从 JSON 构造实例，校验失败抛 ValueError"""
 
     @classmethod
-    def parse_body(cls) -> tuple[Self | None, str | None]:
+    def parse_body(cls) -> tuple[Self | None, str | None, int | None]:
         """
         校验请求体，返回 (schema, 错误响应)
         调用方必须用两个变量接收
-        :return:self, err
+        :return:self, err, status
         """
         try:
             # 获取json数据并校验
-            return cls.from_json(request.get_json(silent=True)), None
+            return cls.from_json(request.get_json(silent=True)), None, None
         except (TypeError, ValueError) as e:
-            return None, str(e)
+            return None, str(e), 400

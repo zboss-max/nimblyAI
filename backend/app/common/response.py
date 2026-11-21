@@ -45,6 +45,11 @@ def fail(msg: str, status=400, code=1, data: dict = None):
     return {'code': code, 'msg': msg, 'data': data}, status
 
 
+"""
+JWT 错误回调：把扩展的默认响应统一成项目格式
+"""
+
+
 def register_jwt_callbacks(jwt):
     """JWT 错误回调：把扩展的默认响应统一成项目格式"""
 
@@ -68,6 +73,10 @@ def register_jwt_callbacks(jwt):
         """统一把 identity 规定为字符串"""
         return str(user_id)
 
+
+"""
+接管系统报错的404和500统一成项目格式
+"""
 
 _HTTP_MSG = {
     400: '请求参数错误',

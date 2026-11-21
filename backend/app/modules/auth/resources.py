@@ -15,17 +15,17 @@ class SignIn(MethodView):
 
     def post(self):
         # 校验
-        schema, err = SignInSchema.parse_body()
+        schema, err, status = SignInSchema.parse_body()
         if err:
-            return fail(err, 400)
+            return fail(err, status)
 
         # 处理
-        user, err = AuthService.sign_in(
+        user, err, status = AuthService.sign_in(
             identifier=schema.identifier,
             password=schema.password
         )
         if err:
-            return fail(err, 401)
+            return fail(err, status)
 
         # 响应
         token = create_access_token(identity=user.id)  # 创建token，访问令牌
@@ -42,26 +42,19 @@ class SignUp(MethodView):
 
     def post(self):
         # 校验
-        schema, err = SignUpSchema.parse_body()
+        schema, err, status = SignUpSchema.parse_body()
         if err:
-            return fail(err, 400)
+            return fail(err, status)
 
         # 处理
-        user, err = AuthService.sign_up(
+        user, err, status = AuthService.sign_up(
             username=schema.username,
             phone=schema.phone,
             email=schema.email,
             password=schema.password
         )
         if err:
-            return fail(err, 409)
+            return fail(err, status)
 
         # 响应
-        token = create_access_token(identity=user.id)  # 创建token，访问令牌
-        return ok(
-            {
-                'token': token,
-                'user': user.to_dict()
-            },
-            201
-        )
+        return ok(status=201)

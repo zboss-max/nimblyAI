@@ -15,10 +15,10 @@ class AuthService:
     def sign_in(
             identifier: str,
             password: str
-    ) -> tuple[User | None, str | None]:
+    ) -> tuple[User | None, str | None, int | None]:
         """
         登录：按任意标识查用户 → 验密（不区分“用户不存在”和“密码错误”）
-        :return: user, err
+        :return: user, err, status
         """
         # 确定账号类型
         if PHONE_PATTERN.match(identifier):
@@ -33,9 +33,9 @@ class AuthService:
             db.select(User).filter(column == identifier)
         ).one_or_none()
         if not user or not user.verify_password(password):
-            return None, '账号或密码错误'
+            return None, '账号或密码错误', 401
 
-        return user, None
+        return user, None, None
 
     @staticmethod
     def sign_up(
@@ -43,10 +43,10 @@ class AuthService:
             phone: str,
             email: str,
             password: str,
-    ) -> tuple[User | None, str | None]:
+    ) -> tuple[User | None, str | None, int | None]:
         """
         注册：查重三个标识字段 → 创建用户
-        :return: user, err
+        :return: user, err, status
         """
         # 查重
         for value, column, label in (
@@ -57,7 +57,7 @@ class AuthService:
             if value and db.session.scalars(
                     db.select(User).filter(column == value)
             ).one_or_none():
-                return None, label + '已被占用'
+                return None, label + '已被占用', 409
 
         # 创建
         user = User()
@@ -72,6 +72,6 @@ class AuthService:
             db.session.commit()
         except IntegrityError:
             db.session.rollback()  # 必须回滚，否则 session 进入 invalid 状态
-            return None, '用户名/手机号/邮箱已被占用'
+            return None, '用户名/手机号/邮箱已被占用', 409
 
-        return user, None
+        return user, None, None
